@@ -3,17 +3,10 @@ const Telegraf = require("telegraf").Telegraf;
         BOT_TOKEN = "5696222306:AAFnS77vQCXcE34mvpM5-iLxGCAzoMdEbs4";
 
 const bot = new Telegraf(BOT_TOKEN);
+let data_from_server = [];
 
 bot.start(ctx =>{
     ctx.reply("Good day sir")
-})
-bot.hears([/Hi+/i,"\u{1F600}"],(ctx) =>{
-    ctx.reply("Good day sir")
-})
-
-bot.hears(/[A-Z]+/i,(ctx) =>{
-    let massage = ctx.message.text;
-    console.log(massage);
     fetch("https://russianwarship.rip/api/v1/statistics/latest",
     {
         method:"GET",
@@ -24,13 +17,25 @@ bot.hears(/[A-Z]+/i,(ctx) =>{
     )
     .then ((data) =>
         {
-            ctx.reply(massage + ": " + data["data"]["stats"][massage]);
-            // console.log("Персонал: "+data["data"]["stats"]["personnel_units"]+"\n"+"Літаків: "+data["data"]["stats"]["planes"]);
-            // console.log("Персоналу: "+data.data.increase.personnel_units+" літаків: "+data.data.increase.planes+" (За 1 день)")
+           data_from_server = data.data.stats;
         }
     )
-    .catch((er) => {
+    .catch((err) => {
         console.log(`Error:${er}`);
     })
+})
+bot.hears([/Hi+/i,"\u{1F600}"],(ctx) =>{
+    ctx.reply("Anything i can do for you?")
+})
+
+bot.hears(/[A-Z]+/i,(ctx) =>{
+    let massage = ctx.message.text;
+    
+    console.log(massage);
+    switch (massage){
+        case "planes":ctx.reply(massage + ": " + data["data"]["stats"][massage]);break;
+        case "tanks":ctx.reply(massage + ": " + data["data"]["stats"][massage]);break;
+        default: ctx.reply("Undefiend massage");
+    }
 });
 bot.launch(); 
